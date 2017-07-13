@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+		http://www.springframework.org/schema/aop  
+		http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	 	http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+		
+		
+		<!-- 配置要扫描的包，扫描包类和方法中的注解 --> 
+		<context:component-scan base-package="com.liulu.strutssm"></context:component-scan>
+		<!--proxy-target-class="true"强制使用cglib代理   如果为false则spring会自动 选择-->
+		<aop:aspectj-autoproxy  proxy-target-class="true"/> 
+		<!-- 数据库配置文件位置 -->
+		<!-- <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">    
+	        <property name="locations">    
+	            <list>    
+	                <value>classpath*:jdbc.properties</value>    
+	            </list>    
+	        </property>    
+       </bean>     -->
+		<context:property-placeholder location="classpath:jdbc.properties" /> 
+		<!-- 配置dbcp数据源 -->
+		<bean id="dataSource"  class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+			<property name="driverClass" value="${jdbc.driverClassName}" />  
+        	<property name="jdbcUrl" value="${jdbc.url}" />  
+        	<property name="user" value="${jdbc.username}" />  
+        	<property name="password" value="${jdbc.password}" /> 
+		</bean>  
+		
+		<!-- 配置mybitas SqlSessionFactoryBean -->
+		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="dataSource" />  
+			<property name="configLocation" value="classpath:mybatis.xml"></property>
+			<property name="mapperLocations">  
+            <list>  
+                <value>classpath:com/liulu/strutssm/dao/usermapper/*.xml</value>  
+            </list>  
+        </property>  
+		</bean>  
+		<!-- 配置SqlSessionTemplate -->
+		<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate ">
+		 	<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory" />
+		</bean>  
+		<!-- 事务配置 -->   
+		<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+			<property name="dataSource" ref="dataSource" />   
+		</bean>
+		<!-- 使用annotation注解方式配置事务 -->
+		<tx:annotation-driven transaction-manager="transactionManager"/>
+		
+		<!-- DAO接口所在包名，Spring会自动查找其下的类并注入到Spring的容器中 -->
+		<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+			<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+			<property name="basePackage" value="com.liulu.strutssm.dao" />
+		</bean>
+		 
+	</beans>
