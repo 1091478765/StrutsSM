@@ -37,6 +37,8 @@ public class LoginAction extends ActionSupport{
 	
 	//--------------第二次修改--------------------------------------------------//
 	
+	//________这是第三次修改----------------//
+	
 	public String getUsername() {
 		return username;
 	}
