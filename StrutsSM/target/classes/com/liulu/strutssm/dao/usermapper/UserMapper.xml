@@ -6,4 +6,6 @@
 	<select id="login" parameterType="com.liulu.strutssm.condition.UserCondition" resultType="User">
 		select * from tuser o where o.username = #{userEquals} and o.password = #{passwordEquals}
 	</select>
-</mapper>
+	
+	<select id="queryList"  resultType="UserConditon"></select>
+</mapper>  
